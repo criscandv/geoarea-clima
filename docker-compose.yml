@@ -1,0 +1,27 @@
+version: '3.9'
+
+services: 
+  db:
+    image: postgres:11-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=example
+      - POSTGRES_PASSWORD=thisisthepass
+      - POSTGRES_DB=db_clima
+  api:
+    build: ./clima_api
+    command: flask run
+    volumes:
+      - ./clima_api/:/usr/src/clima_api
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_ENV=development
+    depends_on:
+      - db
+
+volumes: 
+  postgres_data:
