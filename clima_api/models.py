@@ -1,4 +1,21 @@
 from app import db
+from datetime import datetime
+
+
+def process_dict(row):
+    my_dict = {}
+    now = datetime.now()
+    for key in row.keys():
+        if key.startswith('_'):
+            continue
+
+        my_dict[key] = row[key]
+        if type(row[key]) == type(now.time()):
+            my_dict[key] = row[key].strftime("%H:%M")
+        elif type(row[key]) == type(now.date()):
+            my_dict[key] = row[key].strftime("%Y-%m-%d")
+
+    return my_dict
 
 
 class Day(db.Model):
@@ -20,10 +37,30 @@ class Day(db.Model):
     text = db.Column(db.String(120), nullable=True)
     wind = db.Column(db.Integer, nullable=True)
     wind_direction = db.Column(db.String(50), nullable=True)
-    hours = db.relationship('Hour', backref='day', lazy=True)
+    hours = db.relationship('Hour', backref='day', lazy='joined')
 
     def __repr__(self):
         return f'<date {self.date}> <localidad {self.city}>'
+
+    def get_dict_data(self, localidad):
+        days = Day.query
+        if localidad:
+            days = Day.query.filter(Day.city.ilike(f'%{localidad}%'))
+
+        days = days.all()
+        
+        to_dict = []
+        for d in days:
+            day = process_dict(d.__dict__)
+            hours = []
+            for h in day['hours']:
+                hour = process_dict(h.__dict__)
+                hours.append(hour)
+
+            day['hours'] = hours
+            to_dict.append(day)
+
+        return to_dict
 
 
 class Hour(db.Model):

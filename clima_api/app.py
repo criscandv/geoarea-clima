@@ -1,10 +1,7 @@
-import os
-import requests
-
 from flask import Flask
 from flask import request
-from flask import jsonify
 from flask import Response
+from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 from config import DevelopmentConfig as Config
@@ -65,7 +62,13 @@ def get_api_data():
 
 @app.route('/get-clima-data/')
 def get_clima_data():
-    return 'Return data'
+    try:
+        localidad = request.args.get('localidad', None)
+        days = Day().get_dict_data(localidad)
+
+        return jsonify(len_results=len(days), results=days, status=200)
+    except Exception as e:
+        return Response('Error al obtener los datos', status=500)
 
 
 if __name__ == '__main__':
