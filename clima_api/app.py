@@ -54,7 +54,10 @@ def get_api_data():
         insert_days(climate_bcn['response'])
         insert_hour(climate_bcn['response'].get('hour_hour'), 'Barcelona')
 
-        return 'Database updated. <br><a href="http://localhost:5000/get-clima-data/" target="_blank">Check this route to see the data</a>'
+        return jsonify(
+            response='Datos almacenados.',
+            status=200
+        )
 
     except Exception as e:
         return Response(e, status=500)

@@ -17,3 +17,4 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'postgresql://example:thisisthepass@192.168.1.73/db_clima_test'
